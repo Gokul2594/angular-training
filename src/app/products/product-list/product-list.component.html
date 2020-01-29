@@ -1,0 +1,59 @@
+<h2>
+    {{ title }}
+</h2>
+
+<div class="errorMessage" *ngIf="errorMessage">
+    {{ errorMessage }}
+</div>
+
+<div *ngIf="!errorMessage">
+    <div *ngIf="products$ | async as products;else loading">
+        {{ productNb }} products | 
+        {favourites, plural,
+            =0 {no favourite}
+            =1 {1 favourite}
+            other {{{favourites}} favourites}
+        }
+        <div class="right">
+            <span>Sort By: </span>
+            <button (click)="sortBy('price')">
+                    Price 
+            </button>
+            <button (click)="sortBy('name')">
+                    Name 
+            </button>
+            <button (click)="sortBy('modifiedDate')">
+                    Date
+            </button>
+        </div>
+    
+        <ul class="products">
+            <li *ngFor="let product of products| orderBy:[sorter] | slice:start:end"
+                [class.discontinued]="product.discontinued"
+                [class.selected]="selectedProduct === product"
+                (click)="onSelect(product)"
+                [title]="product | json">
+                <span class="name">{{ product.name | uppercase }}</span>
+                <span class="description">{{ product.description }}</span>
+                <span class="price">{{ product.price | currency:'CAD':'symbol':'.2' }}</span>
+            </li>
+        </ul>
+
+        <div class="right">
+            <a routerLink="insert">Add new Product</a>
+        </div>
+
+        <div>
+            <button (click)="previousPage()" [disabled]="start === 0">
+                < Previous Page
+            </button>
+            <span>Page {{ currentPage }}</span>
+            <button (click)="nextPage()" [disabled]="productNb < end">Next Page ></button>
+        </div>
+    
+    </div>
+</div>
+
+<ng-template #loading>
+    <h2 class="loading">Loading Products....</h2>
+</ng-template>
